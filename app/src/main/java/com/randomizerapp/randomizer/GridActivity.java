@@ -9,26 +9,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+
 
 import org.askerov.dynamicgrid.DynamicGridView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,42 +29,74 @@ public class GridActivity extends AppCompatActivity {
     private List<Item> apps;
     private List<Item> appsoriginal;
 
-    String state;
+
+    String state="";
+    String selectedAppName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.layout_grid);
+        if(getIntent().hasExtra("EXTRA"))
+            state = getIntent().getStringExtra("EXTRA");
+        else{
+            state="";
 
-        state = getIntent().getStringExtra("EXTRA");
+        }
+        if(getIntent().hasExtra("quote")){
+            new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                    .setTitle("Inspirational Quote")
+                    .setMessage(""+getIntent().getStringExtra("quote"))
+                    .setPositiveButton(android.R.string.yes, null)
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .show();
+        }
+        selectedAppName = getIntent().getStringExtra("appSelected");
+        /*Bundle bundle = getIntent().getExtras();
+        apps = bundle.getParcelableArrayList("app_list");*/
 
         loadApps();
         gridView = (DynamicGridView) findViewById(R.id.dynamic_grid);
 
         GridViewAdapter gridViewAdpter = new GridViewAdapter(getApplicationContext(), apps, 5);
         gridView.setAdapter(gridViewAdpter);
-
-        //Handling click event of each Grid view item
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*gridView.setOnDragListener(new View.OnDragListener(){
             @Override
-            public void onItemClick(AdapterView parent, View view, int position, long id) {
-                //GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
-                //updateApps();
-                /*new AlertDialog.Builder(GridActivity.this)
-                    .setTitle("Item information")
-                    .setMessage("You clicked at position: " + position +"\n"
-                            + apps.get(position).getName()+ " \n"+gridView.getstartDragPosition(position)+"\n"+ apps.get(position).getPosition()
-                            +"\n"+ hol.getAppName()+"\n"+hol.getAppPos())
-                    .setPositiveButton(android.R.string.yes, null)
+            public boolean onDrag(View v, DragEvent event){
+                View app2;
+                int action = event.getAction();
+                switch(event.getAction()){
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        break;
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                        //app2 = (View)event.getLocalState();
+                        break;
+                    case DragEvent.ACTION_DRAG_EXITED:
+                        break;
+                    case DragEvent.ACTION_DROP:
+                        View view = (View)event.getLocalState();
+                        ViewGroup owner = (ViewGroup) view.getParent();
+                        owner.removeView(view);
+                        //Folder newFolder = new Folder(view, v);
+                        //newFolder.addView();
+                        view.setVisibility(View.VISIBLE);
+                        Intent intent = new Intent(getApplicationContext(), FolderActivity.class);
+                        GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
+                        GridViewAdapter.ViewHolder hol2 = (GridViewAdapter.ViewHolder)v.getTag();
+                        intent.putExtra("app1name",hol.getAppName());
+                        intent.putExtra("app2name",hol2.getAppName());
+                        startActivity(intent);
 
-                    .setIcon(android.R.drawable.ic_dialog_info)
-                    .show();*/
-
-                Intent n = manager.getLaunchIntentForPackage(apps.get(position).getLabel());
-                startActivity(n);
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        break;
+                    default:
+                        break;
+                }
+                return true;
             }
-        });
+        });*/
 
         //Active dragging mode when long click at each Grid view item
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -99,6 +119,42 @@ public class GridActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        //Handling click event of each Grid view item
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
+                //updateApps();
+                /*new AlertDialog.Builder(GridActivity.this)
+                    .setTitle("Item information")
+                    .setMessage("You clicked at position: " + position +"\n"
+                            + apps.get(position).getName()+ " \n"+gridView.getstartDragPosition(position)+"\n"+ apps.get(position).getPosition()
+                            +"\n"+ hol.getAppName()+"\n"+hol.getAppPos())
+                    .setPositiveButton(android.R.string.yes, null)
+
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .show();*/
+                Intent n;
+                if(hol.getAppName().equals(selectedAppName)) {
+                    /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                        .setTitle("Item information")
+                        .setMessage("You clicked at "+selectedAppName+"what")
+                        .setPositiveButton(android.R.string.yes, null)
+
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .show();*/
+                    n = new Intent(getApplicationContext(), FolderActivity.class);
+
+                    n.putExtra("appSelected",selectedAppName);
+                }
+                else
+                    n = manager.getLaunchIntentForPackage(apps.get(position).getLabel());
+                startActivity(n);
+            }
+        });
+
+
     }
 
     private void loadApps() {
@@ -111,9 +167,16 @@ public class GridActivity extends AppCompatActivity {
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
         for (ResolveInfo ri : availableActivities) {
             Item app = new Item();
-            app.label = ri.activityInfo.packageName;
+
             app.name = ri.loadLabel(manager); //get app name
             app.icon = ri.loadIcon(manager); //get app icon
+            if(!app.name.equals(selectedAppName)){
+                //Folder nineApp = new Folder(app);
+                /*intent.putExtra("appSelected",selectedAppName);
+            }else*/
+                app.label = ri.activityInfo.packageName;}
+            /*if(!app.name.equals(selectedAppName))
+                apps.add(app);*/
             apps.add(app);
             app.position = apps.indexOf(app);
         }

@@ -12,7 +12,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
-        android:text="APPS" />
+        android:text="APPS"
+        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
 
     <Switch
         android:id="@+id/switchon"
@@ -22,8 +23,28 @@
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/button"
         android:layout_marginTop="157dp"
+        android:layout_below="@+id/spinnerDescription"
         android:text="Randomize"
         android:gravity="left"/>
+
+    <TextView
+        android:id="@+id/spinnerDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/spinner"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="64dp"
+        android:text="Select the app you are addicted to:"></TextView>
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="192dp" />
 
 
 </RelativeLayout>
