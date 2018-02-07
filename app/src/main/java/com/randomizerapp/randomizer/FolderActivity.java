@@ -1,5 +1,6 @@
 package com.randomizerapp.randomizer;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -78,28 +79,33 @@ public class FolderActivity extends AppCompatActivity{
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
                 FolderAdapter.ViewHolder hol = (FolderAdapter.ViewHolder)view.getTag();
-                //updateApps();
-                /*new AlertDialog.Builder(GridActivity.this)
-                    .setTitle("Item information")
-                    .setMessage("You clicked at position: " + position +"\n"
-                            + apps.get(position).getName()+ " \n"+gridView.getstartDragPosition(position)+"\n"+ apps.get(position).getPosition()
-                            +"\n"+ hol.getAppName()+"\n"+hol.getAppPos())
-                    .setPositiveButton(android.R.string.yes, null)
-
-                    .setIcon(android.R.drawable.ic_dialog_info)
-                    .show();*/
-                Intent n;
+                /*new android.support.v7.app.AlertDialog.Builder(FolderActivity.this)
+                        .setTitle("what's going on")
+                        .setMessage(""+folderApps.get(position).getName()+"\n"+quotes.get(position))
+                        .setPositiveButton(android.R.string.yes, null)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .show();*/
+                Intent m;
                 if(folderApps.get(position).label!=null){
-                    n = manager.getLaunchIntentForPackage(folderApps.get(position).getLabel());
+                    m = manager.getLaunchIntentForPackage(folderApps.get(position).getLabel());
                 }else{
-                    n = new Intent(getApplicationContext(), GridActivity.class);
+                    //m = new Intent(getApplicationContext(), GridActivity.class);
+                    m=getIntent();
                     Collections.shuffle(quotes);
-                    n.putExtra("appSelected",hol.getAppName());
-                    n.putExtra("quote",quotes.get(position));
+                    //m.putExtra("appSelected",hol.getAppName());
+                    m.putExtra("quote",quotes.get(0));
+                    setResult(RESULT_OK,m);
+                    finish();
+                    /*new android.support.v7.app.AlertDialog.Builder(FolderActivity.this)
+                            .setTitle("what's going on")
+                            .setMessage(""+folderApps.get(position).getName()+"\n"+quotes.get(0)+" "+m.getStringExtra("quote"))
+                            .setPositiveButton(android.R.string.yes, null)
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();*/
+
                 }
 
-
-                startActivity(n);
+                //startActivity(m);
             }
         });
 
@@ -108,19 +114,7 @@ public class FolderActivity extends AppCompatActivity{
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
                 folderGridView.startEditMode(position);
-                //GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
 
-                //updateApps();
-
-                /*new AlertDialog.Builder(GridActivity.this)
-                        .setTitle("Item information")
-                        .setMessage("You clicked at position: " + position +"\n"
-                                + apps.get(position).getName()+ " \n"+gridView.getstartDragPosition(position)+"\n"+ apps.get(position).getPosition()
-                        +"\n"+ hol.getAppName()+"\n"+hol.getAppPos())
-                        .setPositiveButton(android.R.string.yes, null)
-
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .show();*/
                 return true;
             }
         });

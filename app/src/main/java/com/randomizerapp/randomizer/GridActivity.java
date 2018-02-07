@@ -4,15 +4,26 @@ package com.randomizerapp.randomizer;
  * Created by jenny on 1/25/2018.
  */
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.Switch;
 
+
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.askerov.dynamicgrid.DynamicGridView;
 
@@ -28,76 +39,143 @@ public class GridActivity extends AppCompatActivity {
     private PackageManager manager;
     private List<Item> apps;
     private List<Item> appsoriginal;
+    private List<Item> appsshuffle;
+    private RelativeLayout mLayout;
+    Switch switch1;
+
+    Spinner sp;
+    String quote="";
 
 
     String state="";
     String selectedAppName;
+    SlidingUpPanelLayout slidingPaneLayout;
+    GridViewAdapter gridViewAdpter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.layout_grid);
-        if(getIntent().hasExtra("EXTRA"))
-            state = getIntent().getStringExtra("EXTRA");
-        else{
-            state="";
+        setContentView(R.layout.activity_main);
+        apps = new ArrayList<Item>();
+        appsoriginal = new ArrayList<Item>();
+        appsshuffle= new ArrayList<Item>();
 
-        }
-        if(getIntent().hasExtra("quote")){
-            new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                    .setTitle("Inspirational Quote")
-                    .setMessage(""+getIntent().getStringExtra("quote"))
-                    .setPositiveButton(android.R.string.yes, null)
-                    .setIcon(android.R.drawable.ic_dialog_info)
-                    .show();
-        }
-        selectedAppName = getIntent().getStringExtra("appSelected");
-        /*Bundle bundle = getIntent().getExtras();
-        apps = bundle.getParcelableArrayList("app_list");*/
+
+        switch1 = (Switch)findViewById(R.id.switchon);
+
+        slidingPaneLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        addPanelListener();
 
         loadApps();
+
         gridView = (DynamicGridView) findViewById(R.id.dynamic_grid);
-
-        GridViewAdapter gridViewAdpter = new GridViewAdapter(getApplicationContext(), apps, 5);
+        gridViewAdpter = new GridViewAdapter(getApplicationContext(), appsshuffle, 5);
         gridView.setAdapter(gridViewAdpter);
-        /*gridView.setOnDragListener(new View.OnDragListener(){
+
+        addListeners();
+
+
+        for(int i=0;i<apps.size();i++){
+            Item temp = new Item();
+            temp.setIcon(apps.get(i).getIcon());
+            temp.setLabel(apps.get(i).getLabel());
+            temp.setName(apps.get(i).getName());
+            appsoriginal.add(temp);
+            //appsshuffle.add(temp);
+        }
+
+
+
+
+
+        /*manager = getPackageManager();
+        apps = new ArrayList<>();
+
+        Intent i = new Intent(Intent.ACTION_MAIN, null);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
+        for (ResolveInfo ri : availableActivities) {
+            Item app = new Item();
+            app.label = ri.activityInfo.packageName;
+            app.name = ri.loadLabel(manager); //get app name
+            app.icon = ri.loadIcon(manager); //get app icon
+            apps.add(app);
+            app.position = apps.indexOf(app);
+        }*/
+
+        loadSpinner();
+
+    }
+
+    public void addPanelListener(){
+        slidingPaneLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
-            public boolean onDrag(View v, DragEvent event){
-                View app2;
-                int action = event.getAction();
-                switch(event.getAction()){
-                    case DragEvent.ACTION_DRAG_STARTED:
-                        break;
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                        //app2 = (View)event.getLocalState();
-                        break;
-                    case DragEvent.ACTION_DRAG_EXITED:
-                        break;
-                    case DragEvent.ACTION_DROP:
-                        View view = (View)event.getLocalState();
-                        ViewGroup owner = (ViewGroup) view.getParent();
-                        owner.removeView(view);
-                        //Folder newFolder = new Folder(view, v);
-                        //newFolder.addView();
-                        view.setVisibility(View.VISIBLE);
-                        Intent intent = new Intent(getApplicationContext(), FolderActivity.class);
-                        GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
-                        GridViewAdapter.ViewHolder hol2 = (GridViewAdapter.ViewHolder)v.getTag();
-                        intent.putExtra("app1name",hol.getAppName());
-                        intent.putExtra("app2name",hol2.getAppName());
-                        startActivity(intent);
+            public void onPanelSlide(View panel, float slideOffset) {
 
-                        break;
-                    case DragEvent.ACTION_DRAG_ENDED:
-                        break;
-                    default:
-                        break;
-                }
-                return true;
             }
-        });*/
 
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                if(newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)){
+                    if(switch1.isChecked()){
+                        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                                .setTitle("what's going on")
+                                .setMessage("shuffle")
+                                .setPositiveButton(android.R.string.yes, null)
+                                .setIcon(android.R.drawable.ic_dialog_info)
+                                .show();*/
+
+                        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                                .setTitle("what's going on")
+                                .setMessage("shuffle"+appsshuffle.get(0).getName()+"\n"+appsoriginal.get(0).getName())
+                                .setPositiveButton(android.R.string.yes, null)
+                                .setIcon(android.R.drawable.ic_dialog_info)
+                                .show();*/
+                        if(!state.equals("switchon")) {
+                            Collections.shuffle(appsshuffle);
+                            //int size = gridView.getChildCount();
+                            manager = getPackageManager();
+
+                            Intent m = new Intent(Intent.ACTION_MAIN, null);
+                            m.addCategory(Intent.CATEGORY_LAUNCHER);
+
+                            List<ResolveInfo> availableActivities = manager.queryIntentActivities(m, 0);
+                            for(int i=0;i<appsshuffle.size();i++){
+                                //View gridChild = (View)gridView.getChildAt(i);
+                                //GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)(gridChild.getTag());
+                                for(int y=0;y<availableActivities.size();y++) {
+                                    if (appsshuffle.get(i).getName().equals(availableActivities.get(y).loadLabel(manager))){
+                                        appsshuffle.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
+                                    }
+                                }
+                            }
+                            state = "switchon";
+                        }
+                        //updateApps();
+                        gridViewAdpter=new GridViewAdapter(getApplicationContext(), appsshuffle, 5);
+                        gridView.setAdapter(gridViewAdpter);
+                    }
+                    else{
+                        state="switchoff";
+                        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                                .setTitle("what's going on")
+                                .setMessage("unshuffle"+appsshuffle.get(0).getName()+"\n"+appsoriginal.get(0).getName())
+                                .setPositiveButton(android.R.string.yes, null)
+                                .setIcon(android.R.drawable.ic_dialog_info)
+                                .show();*/
+                        //apps=appsoriginal;
+                        //updateApps();
+                        gridViewAdpter=new GridViewAdapter(getApplicationContext(), appsoriginal, 5);
+                        gridView.setAdapter(gridViewAdpter);
+                    }
+                }
+            }
+        });
+    }
+
+    public void addListeners(){
         //Active dragging mode when long click at each Grid view item
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -147,19 +225,62 @@ public class GridActivity extends AppCompatActivity {
                     n = new Intent(getApplicationContext(), FolderActivity.class);
 
                     n.putExtra("appSelected",selectedAppName);
+                    startActivityForResult(n,1);
                 }
-                else
-                    n = manager.getLaunchIntentForPackage(apps.get(position).getLabel());
-                startActivity(n);
+                else{
+                    n = manager.getLaunchIntentForPackage(appsshuffle.get(position).getLabel());
+                    startActivity(n);
+                }
+
             }
         });
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode == 1){
+            if(resultCode == Activity.RESULT_OK){
+                quote=data.getStringExtra("quote");
+                new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                        .setTitle("Inspirational Quote")
+                        .setMessage(""+quote)
+                        .setPositiveButton(android.R.string.yes, null)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .show();
+            }else
+                quote="";
+        }
+    }
 
+    private void loadSpinner(){
+        Item noneapp = new Item();
+        noneapp.name = "None";
+        apps.add(noneapp);
+
+        sp = (Spinner)findViewById(R.id.spinner);
+        SpinnerAdapter adapter = new SpinnerAdapter(getApplicationContext(), R.layout.spinner_layout, R.id.spinnerText, (ArrayList)apps);
+        sp.setAdapter(adapter);
+
+        sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                int position = sp.getSelectedItemPosition();
+                selectedAppName = apps.get(position).getName();
+                //GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
+                //selectedAppName = hol.getAppName();
+            }
+
+            public void onNothingSelected(AdapterView<?> parent){
+                selectedAppName = "None";
+            }
+        });
+        apps.remove(noneapp);
     }
 
     private void loadApps() {
         manager = getPackageManager();
-        apps = new ArrayList<>();
+        //apps = new ArrayList<>();
 
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -177,15 +298,17 @@ public class GridActivity extends AppCompatActivity {
                 app.label = ri.activityInfo.packageName;}
             /*if(!app.name.equals(selectedAppName))
                 apps.add(app);*/
+            appsshuffle.add(app);
             apps.add(app);
+            app.position = appsshuffle.indexOf(app);
             app.position = apps.indexOf(app);
         }
-        appsoriginal=apps;
-        if(state.equals("switchon")){
+        //appsoriginal=apps;
+        /*if(state.equals("switchon")){
             Collections.shuffle(apps);
         }
         else
-            apps=appsoriginal;
+            apps=appsoriginal;*/
     }
 
     @Override
@@ -209,11 +332,14 @@ public class GridActivity extends AppCompatActivity {
         for(int i=0;i<size;i++){
             View gridChild = (View)gridView.getChildAt(i);
             GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)(gridChild.getTag());
-            apps.get(i).setName(hol.getAppName());
+            appsshuffle.get(i).setName(hol.getAppName());
             for(int y=0;y<availableActivities.size();y++) {
-                if (hol.getAppName().equals(availableActivities.get(y).loadLabel(manager)))
-                    apps.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
+                if (hol.getAppName().equals(availableActivities.get(y).loadLabel(manager))){
+                    appsshuffle.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
+
+                }
             }
         }
     }
+
 }

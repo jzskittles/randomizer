@@ -28,9 +28,7 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
 
     public GridViewAdapter(Context context, List<Item> apps, int columnCount) {
         super(context, apps, columnCount);
-        //for(int i=0;i<apps.size();i++)
         items=apps;
-        //inflter = (LayoutInflater.from(context));
     }
 
     @Override

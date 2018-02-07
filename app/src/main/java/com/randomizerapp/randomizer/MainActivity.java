@@ -53,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
         Item noneapp = new Item();
         noneapp.name = "None";
         apps.add(noneapp);
+        /*new android.support.v7.app.AlertDialog.Builder(MainActivity.this)
+                .setTitle("what's going on")
+                .setMessage("hi")
+                .setPositiveButton(android.R.string.yes, null)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();*/
         /*appsoriginal=apps;
         if(switch1.isChecked()){
             Collections.shuffle(apps);
@@ -83,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
         Button button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,6 +115,18 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+    public void clicks(View v){
+        Intent n = new Intent(getApplicationContext(), GridActivity.class);
+        n.putExtra("appSelected",selectedAppName);
+        n.putExtra("fromMain","Main");
+        /*new android.support.v7.app.AlertDialog.Builder(MainActivity.this)
+                        .setTitle("what's going on")
+                        .setMessage("click!"+ " "+n.getStringExtra("fromMain"))
+                        .setPositiveButton(android.R.string.yes, null)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .show();*/
+        startActivity(n);
     }
 
     @Override

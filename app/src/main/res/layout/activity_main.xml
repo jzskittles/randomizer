@@ -16,18 +16,20 @@
         sothree:umanoShadowHeight="4dp">
 
         <include
-            layout="@layout/layout_main"
+            layout="@layout/layout_grid"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
         <include
-            layout="@layout/layout_secondary"
+            layout="@layout/layout_main"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:clickable="true"
+            />
 
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
