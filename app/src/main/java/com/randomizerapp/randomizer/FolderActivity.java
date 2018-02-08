@@ -87,7 +87,14 @@ public class FolderActivity extends AppCompatActivity{
                         .show();*/
                 Intent m;
                 if(folderApps.get(position).label!=null){
-                    m = manager.getLaunchIntentForPackage(folderApps.get(position).getLabel());
+                    m = manager.getLaunchIntentForPackage(folderApps.get(position).label.toString());
+                    /*new android.support.v7.app.AlertDialog.Builder(FolderActivity.this)
+                            .setTitle("what's going on")
+                            .setMessage("clicked correct")
+                            .setPositiveButton(android.R.string.yes, null)
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();*/
+                    startActivity(m);
                 }else{
                     //m = new Intent(getApplicationContext(), GridActivity.class);
                     m=getIntent();
@@ -105,7 +112,7 @@ public class FolderActivity extends AppCompatActivity{
 
                 }
 
-                //startActivity(m);
+
             }
         });
 

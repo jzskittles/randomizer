@@ -6,9 +6,11 @@ package com.randomizerapp.randomizer;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -61,10 +64,14 @@ public class GridActivity extends AppCompatActivity {
         appsoriginal = new ArrayList<Item>();
         appsshuffle= new ArrayList<Item>();
 
+        tutorial();
+
 
         switch1 = (Switch)findViewById(R.id.switchon);
 
         slidingPaneLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        RelativeLayout rl = (RelativeLayout)findViewById(R.id.mainrelative);
+        //rl.setBackgroundColor(Color.TRANSPARENT);
         addPanelListener();
 
         loadApps();
@@ -109,6 +116,48 @@ public class GridActivity extends AppCompatActivity {
 
     }
 
+    public void tutorial(){
+
+        /*AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
+
+        // set prompts.xml to alertdialog builder
+        // set dialog message
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                        .setTitle("Tutorial")
+                        .setMessage("Your downloaded apps will be displayed in a grid as shown"+"\n"+
+                                //"This app was designed to eliminate environmental triggers involved with phone addiction"+"\n"+
+                                "Swipe up from the bottom of the screen to access the Settings page")
+                        .setPositiveButton(android.R.string.yes, null)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .show();
+            }
+        });
+
+        // create alert dialog
+        // alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialogBuilder.show();*/
+        new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                .setTitle("Tutorial")
+                .setMessage("Hello! Thank you for installing this app"+"\n"+
+                        //"This app was designed to eliminate environmental triggers involved with phone addiction"+"\n"+
+                        "Click OK for a tutorial about the functions")
+                .setPositiveButton(android.R.string.yes, null)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
+
+        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                .setTitle("Tutorial")
+                .setMessage("Your downloaded apps will be displayed in a grid as shown"+"\n"+
+                        //"This app was designed to eliminate environmental triggers involved with phone addiction"+"\n"+
+                        "Swipe up from the bottom of the screen to access the Settings page")
+                .setPositiveButton(android.R.string.yes, null)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();*/
+    }
+
     public void addPanelListener(){
         slidingPaneLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -118,7 +167,11 @@ public class GridActivity extends AppCompatActivity {
 
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                TextView tx =(TextView)findViewById(R.id.textView);
+                if(newState.equals(SlidingUpPanelLayout.PanelState.EXPANDED))
+                    tx.setVisibility(View.VISIBLE);
                 if(newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)){
+                    tx.setVisibility(View.INVISIBLE);
                     if(switch1.isChecked()){
                         /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
                                 .setTitle("what's going on")
@@ -148,6 +201,7 @@ public class GridActivity extends AppCompatActivity {
                                 for(int y=0;y<availableActivities.size();y++) {
                                     if (appsshuffle.get(i).getName().equals(availableActivities.get(y).loadLabel(manager))){
                                         appsshuffle.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
+                                        appsshuffle.get(i).setIcon(availableActivities.get(y).loadIcon(manager));
                                     }
                                 }
                             }
@@ -256,7 +310,7 @@ public class GridActivity extends AppCompatActivity {
     private void loadSpinner(){
         Item noneapp = new Item();
         noneapp.name = "None";
-        apps.add(noneapp);
+        apps.add(0,noneapp);
 
         sp = (Spinner)findViewById(R.id.spinner);
         SpinnerAdapter adapter = new SpinnerAdapter(getApplicationContext(), R.layout.spinner_layout, R.id.spinnerText, (ArrayList)apps);
@@ -275,7 +329,7 @@ public class GridActivity extends AppCompatActivity {
                 selectedAppName = "None";
             }
         });
-        apps.remove(noneapp);
+        //apps.remove(noneapp);
     }
 
     private void loadApps() {

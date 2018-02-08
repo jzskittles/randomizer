@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:id="@+id/mainrelative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
-    android:id="@+id/mainrelative"
-    >
+    android:onClick="clicks"
+    android:orientation="vertical"
+    android:padding="10dp" android:focusable="true">
 
     <Button
         android:id="@+id/button"
@@ -15,38 +16,95 @@
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:text="APPS"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+        android:visibility="invisible" />
 
     <Switch
         android:id="@+id/switchon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button"
-        android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/button"
-        android:layout_marginTop="157dp"
-        android:layout_below="@+id/spinnerDescription"
-        android:text="Randomize"
-        android:gravity="left"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView"
+        android:layout_marginTop="33dp"
+        android:gravity="left"
+        android:text="Randomize    "
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <TextView
         android:id="@+id/spinnerDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/spinner"
-        android:layout_alignEnd="@+id/button"
-        android:layout_alignRight="@+id/button"
-        android:layout_marginBottom="62dp"
-        android:text="Select the app you are addicted to:"></TextView>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView5"
+        android:text="Select the app you are most addicted to:"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#000000"></TextView>
 
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="192dp" />
+        android:layout_below="@+id/spinnerDescription" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="26dp"
+        android:layout_toLeftOf="@+id/button"
+        android:layout_toStartOf="@+id/button"
+        android:text="Settings"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/switchon"
+        android:layout_marginTop="10dp"
+        android:text="If you swipe down to return to the apps page, the apps will shuffle around to change up the order of the apps and prevent habits from kicking in." />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/spinnerDescription"
+        android:layout_marginTop="75dp"
+        android:text="If you swipe down to return to the apps page and try to open the app you chose, a 3x3 folder with 9 of the selected app will pop up instead!" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView3"
+        android:layout_marginTop="15dp"
+        android:text="Out of these 9 apps, 8 are dummy apps and 1 is the original, giving you a 1/9 chance of being able to open the correct app on the first try." />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="AND/OR"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#000000"
+        android:textStyle="bold" />
 
 
 </RelativeLayout>
