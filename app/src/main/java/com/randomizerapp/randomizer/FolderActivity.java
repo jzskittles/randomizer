@@ -101,18 +101,12 @@ public class FolderActivity extends AppCompatActivity{
                     Collections.shuffle(quotes);
                     //m.putExtra("appSelected",hol.getAppName());
                     m.putExtra("quote",quotes.get(0));
+                    m.putExtra("folder","fromfolder");
                     setResult(RESULT_OK,m);
                     finish();
-                    /*new android.support.v7.app.AlertDialog.Builder(FolderActivity.this)
-                            .setTitle("what's going on")
-                            .setMessage(""+folderApps.get(position).getName()+"\n"+quotes.get(0)+" "+m.getStringExtra("quote"))
-                            .setPositiveButton(android.R.string.yes, null)
-                            .setIcon(android.R.drawable.ic_dialog_info)
-                            .show();*/
+
 
                 }
-
-
             }
         });
 
@@ -148,14 +142,6 @@ public class FolderActivity extends AppCompatActivity{
 
             }
         }
-
-
-        folderAppsOriginal=folderApps;
-        if(state.equals("switchon")){
-            Collections.shuffle(folderApps);
-        }
-        else
-            folderApps=folderAppsOriginal;
     }
 
     private void addFolderApps(String name) {

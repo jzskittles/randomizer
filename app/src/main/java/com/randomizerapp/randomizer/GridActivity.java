@@ -16,10 +16,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -54,6 +56,7 @@ public class GridActivity extends AppCompatActivity {
     String selectedAppName;
     SlidingUpPanelLayout slidingPaneLayout;
     GridViewAdapter gridViewAdpter;
+    String fromFolder="";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,7 +77,8 @@ public class GridActivity extends AppCompatActivity {
         //rl.setBackgroundColor(Color.TRANSPARENT);
         addPanelListener();
 
-        loadApps();
+        if(!fromFolder.equals("fromfolder"))
+            loadApps();
 
         gridView = (DynamicGridView) findViewById(R.id.dynamic_grid);
         gridViewAdpter = new GridViewAdapter(getApplicationContext(), appsshuffle, 5);
@@ -92,70 +96,19 @@ public class GridActivity extends AppCompatActivity {
             //appsshuffle.add(temp);
         }
 
-
-
-
-
-        /*manager = getPackageManager();
-        apps = new ArrayList<>();
-
-        Intent i = new Intent(Intent.ACTION_MAIN, null);
-        i.addCategory(Intent.CATEGORY_LAUNCHER);
-
-        List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
-        for (ResolveInfo ri : availableActivities) {
-            Item app = new Item();
-            app.label = ri.activityInfo.packageName;
-            app.name = ri.loadLabel(manager); //get app name
-            app.icon = ri.loadIcon(manager); //get app icon
-            apps.add(app);
-            app.position = apps.indexOf(app);
-        }*/
-
         loadSpinner();
 
     }
 
     public void tutorial(){
 
-        /*AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
-
-        // set prompts.xml to alertdialog builder
-        // set dialog message
-        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                        .setTitle("Tutorial")
-                        .setMessage("Your downloaded apps will be displayed in a grid as shown"+"\n"+
-                                //"This app was designed to eliminate environmental triggers involved with phone addiction"+"\n"+
-                                "Swipe up from the bottom of the screen to access the Settings page")
-                        .setPositiveButton(android.R.string.yes, null)
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .show();
-            }
-        });
-
-        // create alert dialog
-        // alertDialog = alertDialogBuilder.create();
-        // show it
-        alertDialogBuilder.show();*/
         new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
                 .setTitle("Tutorial")
-                .setMessage("Hello! Thank you for installing this app"+"\n"+
-                        //"This app was designed to eliminate environmental triggers involved with phone addiction"+"\n"+
-                        "Click OK for a tutorial about the functions")
+                .setMessage("Hello! Thank you for installing Rehabit!"+"\n"+
+                        "Swipe up from (or click on) the bottom of the screen for the Settings page")
                 .setPositiveButton(android.R.string.yes, null)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .show();
-
-        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                .setTitle("Tutorial")
-                .setMessage("Your downloaded apps will be displayed in a grid as shown"+"\n"+
-                        //"This app was designed to eliminate environmental triggers involved with phone addiction"+"\n"+
-                        "Swipe up from the bottom of the screen to access the Settings page")
-                .setPositiveButton(android.R.string.yes, null)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .show();*/
     }
 
     public void addPanelListener(){
@@ -168,24 +121,43 @@ public class GridActivity extends AppCompatActivity {
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
                 TextView tx =(TextView)findViewById(R.id.textView);
-                if(newState.equals(SlidingUpPanelLayout.PanelState.EXPANDED))
+                RelativeLayout mainLayout=(RelativeLayout)findViewById(R.id.mainrelative);
+
+                if(newState.equals(SlidingUpPanelLayout.PanelState.EXPANDED)){
                     tx.setVisibility(View.VISIBLE);
+                    mainLayout.setBackgroundColor(Color.WHITE);
+                    //appsoriginal=appsshuffle;
+                    new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                            .setTitle("what's going on")
+                            .setMessage("unshuffle"+appsshuffle.get(0).getName()+"\n"+appsoriginal.get(0).getName())
+                            .setPositiveButton(android.R.string.yes, null)
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
+
+                    if(switch1.isChecked()){
+                        for(int i=0;i<appsshuffle.size();i++){
+                            Item temp = new Item();
+                            temp.setIcon(appsshuffle.get(i).getIcon());
+                            temp.setLabel(appsshuffle.get(i).getLabel());
+                            temp.setName(appsshuffle.get(i).getName());
+                            appsoriginal.set(i,temp);
+
+
+                            //appsshuffle.add(temp);
+                        }
+
+                    }else
+                    new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                            .setTitle("what's going on")
+                            .setMessage("unaddshuffle"+appsshuffle.get(0).getName()+"\n"+appsoriginal.get(0).getName())
+                            .setPositiveButton(android.R.string.yes, null)
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
+                }
                 if(newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)){
                     tx.setVisibility(View.INVISIBLE);
+                    mainLayout.setBackgroundColor(Color.TRANSPARENT);
                     if(switch1.isChecked()){
-                        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                                .setTitle("what's going on")
-                                .setMessage("shuffle")
-                                .setPositiveButton(android.R.string.yes, null)
-                                .setIcon(android.R.drawable.ic_dialog_info)
-                                .show();*/
-
-                        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                                .setTitle("what's going on")
-                                .setMessage("shuffle"+appsshuffle.get(0).getName()+"\n"+appsoriginal.get(0).getName())
-                                .setPositiveButton(android.R.string.yes, null)
-                                .setIcon(android.R.drawable.ic_dialog_info)
-                                .show();*/
                         if(!state.equals("switchon")) {
                             Collections.shuffle(appsshuffle);
                             //int size = gridView.getChildCount();
@@ -257,25 +229,8 @@ public class GridActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
                 GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
-                //updateApps();
-                /*new AlertDialog.Builder(GridActivity.this)
-                    .setTitle("Item information")
-                    .setMessage("You clicked at position: " + position +"\n"
-                            + apps.get(position).getName()+ " \n"+gridView.getstartDragPosition(position)+"\n"+ apps.get(position).getPosition()
-                            +"\n"+ hol.getAppName()+"\n"+hol.getAppPos())
-                    .setPositiveButton(android.R.string.yes, null)
-
-                    .setIcon(android.R.drawable.ic_dialog_info)
-                    .show();*/
                 Intent n;
                 if(hol.getAppName().equals(selectedAppName)) {
-                    /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                        .setTitle("Item information")
-                        .setMessage("You clicked at "+selectedAppName+"what")
-                        .setPositiveButton(android.R.string.yes, null)
-
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .show();*/
                     n = new Intent(getApplicationContext(), FolderActivity.class);
 
                     n.putExtra("appSelected",selectedAppName);
@@ -296,14 +251,17 @@ public class GridActivity extends AppCompatActivity {
         if(requestCode == 1){
             if(resultCode == Activity.RESULT_OK){
                 quote=data.getStringExtra("quote");
+                fromFolder=data.getStringExtra("fromfolder");
                 new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
                         .setTitle("Inspirational Quote")
                         .setMessage(""+quote)
                         .setPositiveButton(android.R.string.yes, null)
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .show();
-            }else
+            }else{
                 quote="";
+                fromFolder="";
+            }
         }
     }
 
@@ -390,7 +348,6 @@ public class GridActivity extends AppCompatActivity {
             for(int y=0;y<availableActivities.size();y++) {
                 if (hol.getAppName().equals(availableActivities.get(y).loadLabel(manager))){
                     appsshuffle.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
-
                 }
             }
         }
