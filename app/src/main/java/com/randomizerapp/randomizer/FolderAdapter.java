@@ -5,9 +5,11 @@ package com.randomizerapp.randomizer;
  */
 
 import android.content.Context;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -49,8 +51,11 @@ public class FolderAdapter extends BaseDynamicGridAdapter {
 
         private ViewHolder(View view, int position) {
             //app formatting
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(145,145);
-
+            WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+            int width = display.getWidth();
+            int height = display.getHeight();
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/3-20,width/3-20);
             letterText = (TextView) view.findViewById(R.id.text);
             icon = (ImageView)view.findViewById(R.id.icon);
             icon.setLayoutParams(layoutParams);

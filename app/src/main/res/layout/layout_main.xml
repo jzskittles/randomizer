@@ -8,17 +8,6 @@
     android:orientation="vertical"
     android:padding="10dp" android:focusable="true">
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:gravity="center_horizontal"
-        android:text="APPS"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
-        android:visibility="invisible" />
-
     <Switch
         android:id="@+id/switchon"
         android:layout_width="wrap_content"
@@ -105,6 +94,13 @@
         android:textColor="#000000"
         android:textStyle="bold"/>
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textView7"
+        android:layout_centerHorizontal="true"
+        android:text="Tutorial" />
 
 
 </RelativeLayout>

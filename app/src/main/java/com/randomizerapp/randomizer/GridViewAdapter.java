@@ -7,15 +7,19 @@ package com.randomizerapp.randomizer;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.askerov.dynamicgrid.BaseDynamicGridAdapter;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,8 +41,14 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item, null);
             holder = new ViewHolder(convertView,position);
+            holder.letterText = (TextView)convertView.findViewById(R.id.text);
+            holder.icon = (ImageView)convertView.findViewById(R.id.icon);
             convertView.setTag(holder);
-        }
+        }else
+            holder = (ViewHolder)convertView.getTag();
+        holder.letterText.setText(items.get(position).getName());
+        holder.icon.setImageDrawable(items.get(position).getIcon());
+
         return convertView;
     }
 
@@ -49,7 +59,11 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
 
         private ViewHolder(View view, int position) {
             //app formatting
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(145,145);
+            WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+            int width = display.getWidth();
+            int height = display.getHeight();
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/5-20,width/5-20);
 
             letterText = (TextView) view.findViewById(R.id.text);
             icon = (ImageView)view.findViewById(R.id.icon);

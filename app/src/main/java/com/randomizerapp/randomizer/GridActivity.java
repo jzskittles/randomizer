@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.askerov.dynamicgrid.DynamicGridView;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,13 +95,19 @@ public class GridActivity extends AppCompatActivity {
 
     public void tutorial(){
         //welcome statement, gives initial instructions to make sure user knows what to do
-        new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+        AlertDialog dialog = new AlertDialog.Builder(this).setMessage("Hello! Thank you for installing Rehabit!"+"\n" +
+                "Swipe up from (or click on) the bottom of the screen for the Settings page").setPositiveButton(android.R.string.yes, null).show();
+        TextView textView = (TextView)dialog.findViewById(android.R.id.message);
+        textView.setTextSize(15);
+
+        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
                 .setTitle("Tutorial")
                 .setMessage("Hello! Thank you for installing Rehabit!"+"\n"+
                         "Swipe up from (or click on) the bottom of the screen for the Settings page")
                 .setPositiveButton(android.R.string.yes, null)
                 .setIcon(android.R.drawable.ic_dialog_info)
-                .show();
+                .show();*/
+
     }
 
     public void addPanelListener(){
@@ -261,11 +268,18 @@ public class GridActivity extends AppCompatActivity {
             app.icon = ri.loadIcon(manager); //get app icon
             if(!app.name.equals(selectedAppName)){
                 app.label = ri.activityInfo.packageName;}
+
             //adds apps to shuffled list and normal app list for initialization
             appsshuffle.add(app);
             apps.add(app);
             app.position = appsshuffle.indexOf(app);
             app.position = apps.indexOf(app);
+            for(int x=0;x<apps.size()-1;x++){
+                if(apps.get(x).getName().equals(app.name)){
+                    apps.remove(app);
+                    appsshuffle.remove(app);
+                }
+            }
         }
     }
 
