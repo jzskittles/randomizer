@@ -23,21 +23,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AppsListActivity"
-            android:theme="@style/AppTheme.Wallpaper" />
-        <activity
-            android:name=".Grid"
-            android:theme="@style/AppTheme.Wallpaper" />
-        <activity
-            android:name=".MainActivity"
-            android:theme="@style/AppTheme.Wallpaper" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".FolderActivity"
             android:theme="@style/AppTheme.Wallpaper" />
     </application>

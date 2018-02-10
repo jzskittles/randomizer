@@ -29,6 +29,7 @@ public class SpinnerAdapter extends ArrayAdapter<Item> {
     }
 
     public View getView(int position, View convertView, ViewGroup parent){
+        //adds image and text into custom spinner
         View itemView = inflater.inflate(groupid, parent, false);
         ImageView imageView = (ImageView)itemView.findViewById(R.id.spinnerImage);
         imageView.setImageDrawable(list.get(position).getIcon());

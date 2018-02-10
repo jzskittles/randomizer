@@ -6,22 +6,14 @@ package com.randomizerapp.randomizer;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -45,7 +37,6 @@ public class GridActivity extends AppCompatActivity {
     private List<Item> apps;
     private List<Item> appsoriginal;
     private List<Item> appsshuffle;
-    private RelativeLayout mLayout;
     Switch switch1;
 
     Spinner sp;
@@ -56,52 +47,53 @@ public class GridActivity extends AppCompatActivity {
     String selectedAppName;
     SlidingUpPanelLayout slidingPaneLayout;
     GridViewAdapter gridViewAdpter;
-    String fromFolder="";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        //three arraylists to handle different functions
+        //used for spinner list
         apps = new ArrayList<Item>();
+        //used to return to original state after randomizing
         appsoriginal = new ArrayList<Item>();
+        //used to shuffle and show new randomized page
         appsshuffle= new ArrayList<Item>();
-
+        //launch initial dialog, welcome page
         tutorial();
 
 
         switch1 = (Switch)findViewById(R.id.switchon);
 
         slidingPaneLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        RelativeLayout rl = (RelativeLayout)findViewById(R.id.mainrelative);
-        //rl.setBackgroundColor(Color.TRANSPARENT);
+        //adds listeners and allows panel to sense swipe/click
         addPanelListener();
-
-        if(!fromFolder.equals("fromfolder"))
-            loadApps();
+        //processes all apps downloaded into arraylists
+        loadApps();
 
         gridView = (DynamicGridView) findViewById(R.id.dynamic_grid);
+        //initial apps list
         gridViewAdpter = new GridViewAdapter(getApplicationContext(), appsshuffle, 5);
         gridView.setAdapter(gridViewAdpter);
-
+        //adds listeners to gridview, allows it to respond to clicks and long clicks
         addListeners();
 
-
+        //sets appsoriginal to current apps loaded
         for(int i=0;i<apps.size();i++){
             Item temp = new Item();
             temp.setIcon(apps.get(i).getIcon());
             temp.setLabel(apps.get(i).getLabel());
             temp.setName(apps.get(i).getName());
             appsoriginal.add(temp);
-            //appsshuffle.add(temp);
         }
-
+        //loads spinner for single app selection
         loadSpinner();
 
     }
 
     public void tutorial(){
-
+        //welcome statement, gives initial instructions to make sure user knows what to do
         new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
                 .setTitle("Tutorial")
                 .setMessage("Hello! Thank you for installing Rehabit!"+"\n"+
@@ -118,49 +110,28 @@ public class GridActivity extends AppCompatActivity {
 
             }
 
+            //handles different states of panels (collapsed and expanded) and changes the graphics based on each case, handles changes in settings
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
                 TextView tx =(TextView)findViewById(R.id.textView);
                 RelativeLayout mainLayout=(RelativeLayout)findViewById(R.id.mainrelative);
 
                 if(newState.equals(SlidingUpPanelLayout.PanelState.EXPANDED)){
+                    //changes in formatting
                     tx.setVisibility(View.VISIBLE);
                     mainLayout.setBackgroundColor(Color.WHITE);
-                    //appsoriginal=appsshuffle;
-                    new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                            .setTitle("what's going on")
-                            .setMessage("unshuffle"+appsshuffle.get(0).getName()+"\n"+appsoriginal.get(0).getName())
-                            .setPositiveButton(android.R.string.yes, null)
-                            .setIcon(android.R.drawable.ic_dialog_info)
-                            .show();
-
-                    if(switch1.isChecked()){
-                        for(int i=0;i<appsshuffle.size();i++){
-                            Item temp = new Item();
-                            temp.setIcon(appsshuffle.get(i).getIcon());
-                            temp.setLabel(appsshuffle.get(i).getLabel());
-                            temp.setName(appsshuffle.get(i).getName());
-                            appsoriginal.set(i,temp);
-
-
-                            //appsshuffle.add(temp);
-                        }
-
-                    }else
-                    new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                            .setTitle("what's going on")
-                            .setMessage("unaddshuffle"+appsshuffle.get(0).getName()+"\n"+appsoriginal.get(0).getName())
-                            .setPositiveButton(android.R.string.yes, null)
-                            .setIcon(android.R.drawable.ic_dialog_info)
-                            .show();
                 }
+
                 if(newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)){
+                    //changes in formatting
                     tx.setVisibility(View.INVISIBLE);
                     mainLayout.setBackgroundColor(Color.TRANSPARENT);
+
+                    //handles switch, randomizes
                     if(switch1.isChecked()){
                         if(!state.equals("switchon")) {
                             Collections.shuffle(appsshuffle);
-                            //int size = gridView.getChildCount();
+
                             manager = getPackageManager();
 
                             Intent m = new Intent(Intent.ACTION_MAIN, null);
@@ -168,8 +139,6 @@ public class GridActivity extends AppCompatActivity {
 
                             List<ResolveInfo> availableActivities = manager.queryIntentActivities(m, 0);
                             for(int i=0;i<appsshuffle.size();i++){
-                                //View gridChild = (View)gridView.getChildAt(i);
-                                //GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)(gridChild.getTag());
                                 for(int y=0;y<availableActivities.size();y++) {
                                     if (appsshuffle.get(i).getName().equals(availableActivities.get(y).loadLabel(manager))){
                                         appsshuffle.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
@@ -179,20 +148,19 @@ public class GridActivity extends AppCompatActivity {
                             }
                             state = "switchon";
                         }
-                        //updateApps();
+                        //updates gridview
                         gridViewAdpter=new GridViewAdapter(getApplicationContext(), appsshuffle, 5);
                         gridView.setAdapter(gridViewAdpter);
                     }
                     else{
                         state="switchoff";
-                        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                                .setTitle("what's going on")
-                                .setMessage("unshuffle"+appsshuffle.get(0).getName()+"\n"+appsoriginal.get(0).getName())
-                                .setPositiveButton(android.R.string.yes, null)
-                                .setIcon(android.R.drawable.ic_dialog_info)
-                                .show();*/
-                        //apps=appsoriginal;
-                        //updateApps();
+
+                        manager = getPackageManager();
+
+                        Intent m = new Intent(Intent.ACTION_MAIN, null);
+                        m.addCategory(Intent.CATEGORY_LAUNCHER);
+
+                        //updates gridview
                         gridViewAdpter=new GridViewAdapter(getApplicationContext(), appsoriginal, 5);
                         gridView.setAdapter(gridViewAdpter);
                     }
@@ -202,29 +170,17 @@ public class GridActivity extends AppCompatActivity {
     }
 
     public void addListeners(){
-        //Active dragging mode when long click at each Grid view item
+        //Active dragging mode when long click at each Gridview item
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
                 gridView.startEditMode(position);
-                //GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
 
-                //updateApps();
-
-                /*new AlertDialog.Builder(GridActivity.this)
-                        .setTitle("Item information")
-                        .setMessage("You clicked at position: " + position +"\n"
-                                + apps.get(position).getName()+ " \n"+gridView.getstartDragPosition(position)+"\n"+ apps.get(position).getPosition()
-                        +"\n"+ hol.getAppName()+"\n"+hol.getAppPos())
-                        .setPositiveButton(android.R.string.yes, null)
-
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .show();*/
                 return true;
             }
         });
 
-        //Handling click event of each Grid view item
+        //Handling click event of each Gridview item
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
@@ -237,7 +193,10 @@ public class GridActivity extends AppCompatActivity {
                     startActivityForResult(n,1);
                 }
                 else{
-                    n = manager.getLaunchIntentForPackage(appsshuffle.get(position).getLabel());
+                    if(state.equals("switchon"))
+                        n = manager.getLaunchIntentForPackage(appsshuffle.get(position).getLabel());
+                    else
+                        n = manager.getLaunchIntentForPackage(appsoriginal.get(position).getLabel());
                     startActivity(n);
                 }
 
@@ -248,10 +207,10 @@ public class GridActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode,resultCode,data);
+        //handles information from folderactivity, gets inspirational quote
         if(requestCode == 1){
             if(resultCode == Activity.RESULT_OK){
                 quote=data.getStringExtra("quote");
-                fromFolder=data.getStringExtra("fromfolder");
                 new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
                         .setTitle("Inspirational Quote")
                         .setMessage(""+quote)
@@ -260,16 +219,17 @@ public class GridActivity extends AppCompatActivity {
                         .show();
             }else{
                 quote="";
-                fromFolder="";
             }
         }
     }
 
     private void loadSpinner(){
+        //adds option to not use the single app selection function
         Item noneapp = new Item();
         noneapp.name = "None";
         apps.add(0,noneapp);
 
+        //deploys specific layout for spinner, image + text
         sp = (Spinner)findViewById(R.id.spinner);
         SpinnerAdapter adapter = new SpinnerAdapter(getApplicationContext(), R.layout.spinner_layout, R.id.spinnerText, (ArrayList)apps);
         sp.setAdapter(adapter);
@@ -279,20 +239,16 @@ public class GridActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 int position = sp.getSelectedItemPosition();
                 selectedAppName = apps.get(position).getName();
-                //GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)view.getTag();
-                //selectedAppName = hol.getAppName();
             }
 
             public void onNothingSelected(AdapterView<?> parent){
                 selectedAppName = "None";
             }
         });
-        //apps.remove(noneapp);
     }
 
     private void loadApps() {
         manager = getPackageManager();
-        //apps = new ArrayList<>();
 
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -304,29 +260,20 @@ public class GridActivity extends AppCompatActivity {
             app.name = ri.loadLabel(manager); //get app name
             app.icon = ri.loadIcon(manager); //get app icon
             if(!app.name.equals(selectedAppName)){
-                //Folder nineApp = new Folder(app);
-                /*intent.putExtra("appSelected",selectedAppName);
-            }else*/
                 app.label = ri.activityInfo.packageName;}
-            /*if(!app.name.equals(selectedAppName))
-                apps.add(app);*/
+            //adds apps to shuffled list and normal app list for initialization
             appsshuffle.add(app);
             apps.add(app);
             app.position = appsshuffle.indexOf(app);
             app.position = apps.indexOf(app);
         }
-        //appsoriginal=apps;
-        /*if(state.equals("switchon")){
-            Collections.shuffle(apps);
-        }
-        else
-            apps=appsoriginal;*/
     }
 
     @Override
     public void onBackPressed() {
         if (gridView.isEditMode()) {
             gridView.stopEditMode();
+            //sets back button to update apps for drag and drop
             updateApps();
         } else {
             super.onBackPressed();
@@ -341,13 +288,17 @@ public class GridActivity extends AppCompatActivity {
         m.addCategory(Intent.CATEGORY_LAUNCHER);
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(m, 0);
+        //goes through each item and makes sure apps are updated and match
         for(int i=0;i<size;i++){
             View gridChild = (View)gridView.getChildAt(i);
             GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)(gridChild.getTag());
             appsshuffle.get(i).setName(hol.getAppName());
+            appsoriginal.get(i).setName(hol.getAppName());
             for(int y=0;y<availableActivities.size();y++) {
                 if (hol.getAppName().equals(availableActivities.get(y).loadLabel(manager))){
                     appsshuffle.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
+                    appsoriginal.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
+                    appsoriginal.get(i).setIcon(availableActivities.get(y).loadIcon(manager));
                 }
             }
         }

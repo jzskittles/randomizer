@@ -1,12 +1,9 @@
 package com.randomizerapp.randomizer;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,14 +21,9 @@ import java.util.List;
 public class FolderActivity extends AppCompatActivity{
 
     List<Item> folderApps;
-    List<Item> folderAppsOriginal;
-
     DynamicGridView folderGridView;
-    Folder newFolder;
 
-    String state;
     String app1;
-
     int position;
 
     ArrayList<String> quotes;
@@ -42,14 +34,16 @@ public class FolderActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.folder);
 
+        //keeps apps in arraylist
         folderApps = new ArrayList<Item>();
 
+        //gets apps selected form other activity
         app1 = getIntent().getStringExtra("appSelected");
         if(!app1.equals("")){addFolderApps(app1);}
 
 
         folderGridView = (DynamicGridView) findViewById(R.id.folder_grid);
-
+        //set inspirational quotes
         quotes = new ArrayList<String>();
         quotes.add("“Nothing is impossible; the word itself says, ‘I’m possible!’” – Audrey Hepburn");
         quotes.add("“People often say that motivation doesn’t last. Neither does bathing. That’s why we recommend it daily.” – Zig Ziglar");
@@ -61,56 +55,33 @@ public class FolderActivity extends AppCompatActivity{
         quotes.add("“If you can quit for a day, you can quit for a lifetime.” – Benjamin Alire Sáenz");
         quotes.add("“Whether you think you can or you think you can’t, you’re right.” – Henry Ford");
 
-        //state = getIntent().getStringExtra("EXTRA");
-
-        //newFolder = new Folder();
+        //initial folder list
         FolderAdapter folderAdapter = new FolderAdapter(getApplicationContext(),folderApps,3);
         folderGridView.setAdapter(folderAdapter);
 
-
-        //loadFolderApps();
-
-        /*for(int i=0;i<folderGridView.getChildCount();i++){
-
-        }*/
-
-        //Handling click event of each Grid view item
+        //Handling click event of each Gridview item
         folderGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
                 FolderAdapter.ViewHolder hol = (FolderAdapter.ViewHolder)view.getTag();
-                /*new android.support.v7.app.AlertDialog.Builder(FolderActivity.this)
-                        .setTitle("what's going on")
-                        .setMessage(""+folderApps.get(position).getName()+"\n"+quotes.get(position))
-                        .setPositiveButton(android.R.string.yes, null)
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .show();*/
+
                 Intent m;
                 if(folderApps.get(position).label!=null){
+                    //if you click on the correct app, launch the correct app
                     m = manager.getLaunchIntentForPackage(folderApps.get(position).label.toString());
-                    /*new android.support.v7.app.AlertDialog.Builder(FolderActivity.this)
-                            .setTitle("what's going on")
-                            .setMessage("clicked correct")
-                            .setPositiveButton(android.R.string.yes, null)
-                            .setIcon(android.R.drawable.ic_dialog_info)
-                            .show();*/
                     startActivity(m);
                 }else{
-                    //m = new Intent(getApplicationContext(), GridActivity.class);
+                    //sends quote info back to gridActivity
                     m=getIntent();
                     Collections.shuffle(quotes);
-                    //m.putExtra("appSelected",hol.getAppName());
                     m.putExtra("quote",quotes.get(0));
-                    m.putExtra("folder","fromfolder");
                     setResult(RESULT_OK,m);
                     finish();
-
-
                 }
             }
         });
 
-        //Active dragging mode when long click at each Grid view item
+        //Active dragging mode when long click at each Gridview item
         folderGridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
@@ -136,10 +107,9 @@ public class FolderActivity extends AppCompatActivity{
             folderApps.get(i).setName(hol.getAppName());
             for(int y=0;y<availableActivities.size();y++) {
                 if (hol.getAppName().equals(availableActivities.get(y).loadLabel(manager))){
-                    folderApps.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
-                    folderApps.get(i).icon = availableActivities.get(y).loadIcon(manager);
+                    folderApps.get(i).setLabel(availableActivities.get(y).activityInfo.packageName); //sets app name
+                    folderApps.get(i).icon = availableActivities.get(y).loadIcon(manager); //sets icon
                 }
-
             }
         }
     }
@@ -152,23 +122,22 @@ public class FolderActivity extends AppCompatActivity{
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
 
+        //initializes dummy and correct app, sets icon and name to same
         Item app = new Item();
         Item dummy=new Item();
-        //GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)(view.getTag());
         app.name = name;
         for(int y=0;y<availableActivities.size();y++) {
             if (name.equals(availableActivities.get(y).loadLabel(manager))) {
                 app.label = availableActivities.get(y).activityInfo.packageName;
                 app.icon = availableActivities.get(y).loadIcon(manager);
                 dummy.name=availableActivities.get(y).loadLabel(manager);
-                //dummy.label= "";
                 dummy.icon = availableActivities.get(y).loadIcon(manager);
             }
         }
+        //1 correct app
         folderApps.add(app);
 
-        //dummy.setLabel(selectedApp.label.toString());
-
+        //8 dummy apps
         folderApps.add(dummy);
         folderApps.add(dummy);
         folderApps.add(dummy);
@@ -177,6 +146,7 @@ public class FolderActivity extends AppCompatActivity{
         folderApps.add(dummy);
         folderApps.add(dummy);
         folderApps.add(dummy);
+        //shuffles order of folder apps
         Collections.shuffle(folderApps);
     }
 
@@ -184,6 +154,7 @@ public class FolderActivity extends AppCompatActivity{
     public void onBackPressed() {
         if (folderGridView.isEditMode()) {
             folderGridView.stopEditMode();
+            //sets back button to update apps for drag and drop
             updateApps();
         } else {
             super.onBackPressed();
@@ -198,6 +169,7 @@ public class FolderActivity extends AppCompatActivity{
         m.addCategory(Intent.CATEGORY_LAUNCHER);
 
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(m, 0);
+        //goes through each item and makes sure apps are updated and match
         for(int i=0;i<size;i++){
             View gridChild = (View)folderGridView.getChildAt(i);
             FolderAdapter.ViewHolder hol = (FolderAdapter.ViewHolder)(gridChild.getTag());
@@ -207,10 +179,7 @@ public class FolderActivity extends AppCompatActivity{
                     folderApps.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
                     folderApps.get(i).icon = availableActivities.get(y).loadIcon(manager);
                 }
-
             }
         }
     }
-
-
 }

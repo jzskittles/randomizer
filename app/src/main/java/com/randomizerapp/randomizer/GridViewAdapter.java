@@ -22,49 +22,33 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GridViewAdapter extends BaseDynamicGridAdapter {
-    //Context context;
     List<Item> items;
-    LayoutInflater inflter = null;
 
     public GridViewAdapter(Context context, List<Item> apps, int columnCount) {
         super(context, apps, columnCount);
+        //takes in apps from gridview activity
         items=apps;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+        //takes layout of item, makes it standardized
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item, null);
             holder = new ViewHolder(convertView,position);
             convertView.setTag(holder);
-        }/* else {
-            holder = (ViewHolder) convertView.getTag();
-        }*/
-
-        /*LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(145,145);
-
-
-        ImageView appIcon = (ImageView)convertView.findViewById(R.id.icon);
-        appIcon.setLayoutParams(layoutParams);
-        appIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        //appIcon.setPadding(5,3,5,3);
-        appIcon.setImageDrawable(items.get(position).icon);
-        TextView appName = (TextView)convertView.findViewById(R.id.text);
-        appName.setText(items.get(position).name);*/
-
-        //holder.build(getItem(position).toString());
-
-        //convertView = inflter.inflate(R.layout.item, null);
+        }
         return convertView;
     }
 
     public class ViewHolder {
-        private ImageView icon;
-        private TextView letterText;
-        private int pos;
+        private ImageView icon; //app icon
+        private TextView letterText; //app name
+        private int pos; //app position
 
         private ViewHolder(View view, int position) {
+            //app formatting
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(145,145);
 
             letterText = (TextView) view.findViewById(R.id.text);
@@ -75,10 +59,7 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
             letterText.setText(items.get(position).name);
             pos = items.get(position).position;
         }
-
-        /*void build(String title) {
-            letterText.setText(title);
-        }*/
+        //methods to fetch characteristics of apps
         public int getAppPos(){
             return pos;
         }

@@ -30,6 +30,7 @@ public class FolderAdapter extends BaseDynamicGridAdapter {
         ViewHolder holder;
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item, null);
+            //sets size of apps and text in folder, custom sizing
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(200,200);
 
             holder = new ViewHolder(convertView,position);
@@ -38,16 +39,16 @@ public class FolderAdapter extends BaseDynamicGridAdapter {
 
             convertView.setTag(holder);
         }
-
         return convertView;
     }
 
     public class ViewHolder {
-        private ImageView icon;
-        private TextView letterText;
-        private int pos;
+        private ImageView icon; //app icon
+        private TextView letterText; //app name
+        private int pos; //app position
 
         private ViewHolder(View view, int position) {
+            //app formatting
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(145,145);
 
             letterText = (TextView) view.findViewById(R.id.text);
@@ -58,21 +59,18 @@ public class FolderAdapter extends BaseDynamicGridAdapter {
             letterText.setText(items.get(position).name);
             pos = items.get(position).position;
         }
-
+        //methods to fetch characteristics of apps
         public int getAppPos(){
             return pos;
         }
         public String getAppName(){
             return letterText.getText().toString();
         }
-
         public void setAppPos(int newpos){
             pos=newpos;
         }
         public void setAppName(String newname){
             letterText.setText(newname);
         }
-
     }
-
 }
