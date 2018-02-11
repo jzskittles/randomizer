@@ -5,6 +5,7 @@ package com.randomizerapp.randomizer;
  */
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,6 +58,8 @@ public class FolderAdapter extends BaseDynamicGridAdapter {
             int height = display.getHeight();
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/3-20,width/3-20);
             letterText = (TextView) view.findViewById(R.id.text);
+            Typeface face = Typeface.createFromAsset(getContext().getAssets(),"Roboto-Regular.ttf");
+            letterText.setTypeface(face);
             icon = (ImageView)view.findViewById(R.id.icon);
             icon.setLayoutParams(layoutParams);
             icon.setScaleType(ImageView.ScaleType.CENTER_CROP);

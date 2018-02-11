@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -60,7 +61,8 @@ public class GridActivity extends AppCompatActivity {
     String state="";
     String selectedAppName;
     String oldselectedAppName="None";
-    String selectedChange="No";
+    String oldoldappname="s";
+    String selectedChange="No change";
     SlidingUpPanelLayout slidingPaneLayout;
     GridViewAdapter gridViewAdpter;
 
@@ -68,6 +70,7 @@ public class GridActivity extends AppCompatActivity {
     private StringRequest request;
     private String URL="http://rehabit.000webhostapp.com/selectApp.php";
     private RequestQueue requestQueue;
+    private String correctposition="";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,20 +98,10 @@ public class GridActivity extends AppCompatActivity {
 
         gridView = (DynamicGridView) findViewById(R.id.dynamic_grid);
         //initial apps list
-        gridViewAdpter = new GridViewAdapter(getApplicationContext(), appsshuffle, 5);
-        gridView.setAdapter(gridViewAdpter);
+        gridView.setAdapter(new GridViewAdapter(getApplicationContext(), appsoriginal, 5));
         //adds listeners to gridview, allows it to respond to clicks and long clicks
         addListeners();
 
-        //sets appsoriginal to current apps loaded
-        for(int i=0;i<apps.size();i++){
-
-            Item temp = new Item();
-            temp.setIcon(apps.get(i).getIcon());
-            temp.setLabel(apps.get(i).getLabel());
-            temp.setName(apps.get(i).getName());
-            appsoriginal.add(temp);
-        }
         //loads spinner for single app selection
         loadSpinner();
 
@@ -120,7 +113,9 @@ public class GridActivity extends AppCompatActivity {
         AlertDialog dialog = new AlertDialog.Builder(this).setMessage("Hello! Thank you for installing Rehabit!"+"\n" +
                 "Swipe up from (or click on) the bottom of the screen for the Settings page").setPositiveButton(android.R.string.yes, null).show();
         TextView textView = (TextView)dialog.findViewById(android.R.id.message);
-        textView.setTextSize(15);
+        Typeface face = Typeface.createFromAsset(this.getAssets(),"Roboto-Regular.ttf");
+        textView.setTypeface(face);
+        textView.setTextSize(13);
 
     }
 
@@ -135,19 +130,23 @@ public class GridActivity extends AppCompatActivity {
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
                 TextView tx =(TextView)findViewById(R.id.textView);
+                Typeface face = Typeface.createFromAsset(getApplicationContext().getAssets(),"Roboto-Regular.ttf");
+                tx.setTypeface(face);
                 RelativeLayout mainLayout=(RelativeLayout)findViewById(R.id.mainrelative);
 
-                if(newState.equals(SlidingUpPanelLayout.PanelState.EXPANDED)){
+                if(previousState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)&&newState.equals(SlidingUpPanelLayout.PanelState.DRAGGING)){
                     //changes in formatting
                     tx.setVisibility(View.VISIBLE);
                     mainLayout.setBackgroundColor(Color.WHITE);
                 }
 
-                if(newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)){
+                if(previousState.equals(SlidingUpPanelLayout.PanelState.EXPANDED)&&newState.equals(SlidingUpPanelLayout.PanelState.DRAGGING)){
                     //changes in formatting
                     tx.setVisibility(View.INVISIBLE);
                     mainLayout.setBackgroundColor(Color.TRANSPARENT);
+                }
 
+                if(newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)){
                     //handles switch, randomizes
                     if(switch1.isChecked()){
                         if(!state.equals("switchon")) {
@@ -196,12 +195,6 @@ public class GridActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
                 gridView.startEditMode(position);
-                new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                        .setMessage(appsshuffle.get(position).getName() + "\n" + appsoriginal.get(position).getName() + "\n" + apps.get(position).getName())
-                        .setPositiveButton(android.R.string.yes, null)
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .show();
-
 
                 return true;
             }
@@ -217,6 +210,7 @@ public class GridActivity extends AppCompatActivity {
                     n = new Intent(getApplicationContext(), FolderActivity.class);
 
                     n.putExtra("appSelected",selectedAppName);
+                    n.putExtra("correct",correctposition);
                     startActivityForResult(n,1);
                 }
                 else{
@@ -226,7 +220,6 @@ public class GridActivity extends AppCompatActivity {
                         n = manager.getLaunchIntentForPackage(appsoriginal.get(position).getLabel());
                     startActivity(n);
                 }
-
             }
         });
     }
@@ -242,8 +235,8 @@ public class GridActivity extends AppCompatActivity {
                         .setTitle("Inspirational Quote")
                         .setMessage(""+quote)
                         .setPositiveButton(android.R.string.yes, null)
-                        .setIcon(android.R.drawable.ic_dialog_info)
                         .show();
+                correctposition=data.getStringExtra("correctapps");
             }else{
                 quote="";
             }
@@ -330,6 +323,7 @@ public class GridActivity extends AppCompatActivity {
             if(!app.name.equals(selectedAppName)){
                 app.label = ri.activityInfo.packageName;}
 
+
             //adds apps to shuffled list and normal app list for initialization
             appsshuffle.add(app);
             appsoriginal.add(app);
@@ -344,9 +338,16 @@ public class GridActivity extends AppCompatActivity {
         if (gridView.isEditMode()) {
             gridView.stopEditMode();
             //sets back button to update apps for drag and drop, different methods to solve original bug
-            if(!switch1.isChecked())
+            if(!switch1.isChecked()){
                 updateApps();
-            else updateShuffleApps();
+                gridView.setAdapter(new GridViewAdapter(getApplicationContext(), appsoriginal, 5));
+            }
+            else{
+                updateShuffleApps();
+                gridView.setAdapter(new GridViewAdapter(getApplicationContext(), appsshuffle, 5));
+            }
+            gridViewAdpter.notifyDataSetChanged();
+
         } else {
             super.onBackPressed();
         }
@@ -373,6 +374,8 @@ public class GridActivity extends AppCompatActivity {
                 }
             }
         }
+        gridViewAdpter=new GridViewAdapter(getApplicationContext(), appsshuffle, 5);
+        gridView.setAdapter(gridViewAdpter);
 
     }
 
@@ -397,6 +400,9 @@ public class GridActivity extends AppCompatActivity {
                 }
             }
         }
+
+        gridViewAdpter=new GridViewAdapter(getApplicationContext(), appsoriginal, 5);
+        gridView.setAdapter(gridViewAdpter);
 
     }
 

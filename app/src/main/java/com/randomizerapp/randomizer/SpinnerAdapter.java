@@ -1,6 +1,7 @@
 package com.randomizerapp.randomizer;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ public class SpinnerAdapter extends ArrayAdapter<Item> {
         ImageView imageView = (ImageView)itemView.findViewById(R.id.spinnerImage);
         imageView.setImageDrawable(list.get(position).getIcon());
         TextView textView = (TextView)itemView.findViewById(R.id.spinnerText);
+        Typeface face = Typeface.createFromAsset(getContext().getAssets(),"Roboto-Regular.ttf");
+        textView.setTypeface(face);
         textView.setText(list.get(position).getName());
         return itemView;
     }

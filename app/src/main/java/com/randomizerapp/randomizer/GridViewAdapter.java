@@ -7,6 +7,7 @@ package com.randomizerapp.randomizer;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Typeface;
 import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
@@ -40,15 +41,17 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
         //takes layout of item, makes it standardized
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item, null);
-            holder = new ViewHolder(convertView,position);
-            holder.letterText = (TextView)convertView.findViewById(R.id.text);
-            holder.icon = (ImageView)convertView.findViewById(R.id.icon);
+            holder = new ViewHolder(convertView);
+            //holder.letterText = (TextView)convertView.findViewById(R.id.text);
+            //holder.icon = (ImageView)convertView.findViewById(R.id.icon);
             convertView.setTag(holder);
         }else
             holder = (ViewHolder)convertView.getTag();
-        //holder.letterText.setText(items.get(position).getName());
-        //holder.icon.setImageDrawable(items.get(position).getIcon());
-
+        Item app = (Item)getItem(position);
+        holder.letterText.setText(app.getName());
+        holder.icon.setImageDrawable(app.getIcon());
+        //holder.icon.setImageDrawable(getItem(position));
+        //holder.build(items.get(position).getName(),position);
         return convertView;
     }
 
@@ -57,22 +60,25 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
         private TextView letterText; //app name
         private int pos; //app position
 
-        private ViewHolder(View view, int position) {
+        private ViewHolder(View view) {
             //app formatting
             WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
             Display display = wm.getDefaultDisplay();
             int width = display.getWidth();
             int height = display.getHeight();
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/5-45,width/5-45);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/5-45,width/5-50);
+
+            Typeface face = Typeface.createFromAsset(getContext().getAssets(),"Roboto-Regular.ttf");
 
             letterText = (TextView) view.findViewById(R.id.text);
+            letterText.setTypeface(face);
             letterText.setTextSize(10);
             icon = (ImageView)view.findViewById(R.id.icon);
             icon.setLayoutParams(layoutParams);
             icon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            icon.setImageDrawable(items.get(position).icon);
-            letterText.setText(items.get(position).name);
-            pos = items.get(position).position;
+            //icon.setImageDrawable(items.get(position).icon);
+            //letterText.setText(items.get(position).name);
+            //pos = items.get(position).position;
         }
         //methods to fetch characteristics of apps
         public int getAppPos(){
@@ -88,6 +94,11 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
         public void setAppName(String newname){
             letterText.setText(newname);
         }
+
+        /*void build(String title, int position){
+            letterText.setText(title);
+            icon.setImageDrawable(items.get(position).icon);
+        }*/
 
     }
 
