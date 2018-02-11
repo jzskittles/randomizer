@@ -20,8 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -198,6 +196,12 @@ public class GridActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
                 gridView.startEditMode(position);
+                new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                        .setMessage(appsshuffle.get(position).getName() + "\n" + appsoriginal.get(position).getName() + "\n" + apps.get(position).getName())
+                        .setPositiveButton(android.R.string.yes, null)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .show();
+
 
                 return true;
             }
@@ -272,20 +276,12 @@ public class GridActivity extends AppCompatActivity {
 
                         @Override
                         public void onResponse(String response) {
-                            new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                                    .setMessage("response! "+ response + "\n" + selectedChange + "\n"+selectedAppName.toString()+"\n"+oldselectedAppName.toString())
-                                    .setPositiveButton(android.R.string.yes, null)
-                                    .setIcon(android.R.drawable.ic_dialog_info)
-                                    .show();
+
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                                    .setMessage("error! " + error)
-                                    .setPositiveButton(android.R.string.yes, null)
-                                    .setIcon(android.R.drawable.ic_dialog_info)
-                                    .show();
+
                         }
                     }){
                         @Override
@@ -347,19 +343,16 @@ public class GridActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (gridView.isEditMode()) {
             gridView.stopEditMode();
-            //sets back button to update apps for drag and drop
+            //sets back button to update apps for drag and drop, different methods to solve original bug
             if(!switch1.isChecked())
                 updateApps();
+            else updateShuffleApps();
         } else {
             super.onBackPressed();
         }
     }
 
-    public void updateApps(){
-
-        /*sp = (Spinner)findViewById(R.id.spinner);
-        SpinnerAdapter adapter = new SpinnerAdapter(getApplicationContext(), R.layout.spinner_layout, R.id.spinnerText, (ArrayList)apps);
-        sp.setAdapter(adapter);*/
+    public void updateShuffleApps(){
 
         int size = gridView.getChildCount();
         manager = getPackageManager();
@@ -373,11 +366,32 @@ public class GridActivity extends AppCompatActivity {
             View gridChild = (View)gridView.getChildAt(i);
             GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)(gridChild.getTag());
             appsshuffle.get(i).setName(hol.getAppName());
-            appsoriginal.get(i).setName(hol.getAppName());
             for(int y=0;y<availableActivities.size();y++) {
                 if (hol.getAppName().equals(availableActivities.get(y).loadLabel(manager))){
                     appsshuffle.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
                     appsshuffle.get(i).setIcon(availableActivities.get(y).loadIcon(manager));
+                }
+            }
+        }
+
+    }
+
+    public void updateApps(){
+
+        int size = gridView.getChildCount();
+        manager = getPackageManager();
+
+        Intent m = new Intent(Intent.ACTION_MAIN, null);
+        m.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        List<ResolveInfo> availableActivities = manager.queryIntentActivities(m, 0);
+        //goes through each item and makes sure apps are updated and match
+        for(int i=0;i<size;i++){
+            View gridChild = (View)gridView.getChildAt(i);
+            GridViewAdapter.ViewHolder hol = (GridViewAdapter.ViewHolder)(gridChild.getTag());
+            appsoriginal.get(i).setName(hol.getAppName());
+            for(int y=0;y<availableActivities.size();y++) {
+                if (hol.getAppName().equals(availableActivities.get(y).loadLabel(manager))){
                     appsoriginal.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
                     appsoriginal.get(i).setIcon(availableActivities.get(y).loadIcon(manager));
                 }
