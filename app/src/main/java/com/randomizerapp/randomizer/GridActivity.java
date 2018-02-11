@@ -11,23 +11,38 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.askerov.dynamicgrid.DynamicGridView;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GridActivity extends AppCompatActivity {
 
@@ -46,8 +61,15 @@ public class GridActivity extends AppCompatActivity {
 
     String state="";
     String selectedAppName;
+    String oldselectedAppName="None";
+    String selectedChange="No";
     SlidingUpPanelLayout slidingPaneLayout;
     GridViewAdapter gridViewAdpter;
+
+    Button tutorial;
+    private StringRequest request;
+    private String URL="http://rehabit.000webhostapp.com/selectApp.php";
+    private RequestQueue requestQueue;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,6 +104,7 @@ public class GridActivity extends AppCompatActivity {
 
         //sets appsoriginal to current apps loaded
         for(int i=0;i<apps.size();i++){
+
             Item temp = new Item();
             temp.setIcon(apps.get(i).getIcon());
             temp.setLabel(apps.get(i).getLabel());
@@ -91,6 +114,7 @@ public class GridActivity extends AppCompatActivity {
         //loads spinner for single app selection
         loadSpinner();
 
+
     }
 
     public void tutorial(){
@@ -99,14 +123,6 @@ public class GridActivity extends AppCompatActivity {
                 "Swipe up from (or click on) the bottom of the screen for the Settings page").setPositiveButton(android.R.string.yes, null).show();
         TextView textView = (TextView)dialog.findViewById(android.R.id.message);
         textView.setTextSize(15);
-
-        /*new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
-                .setTitle("Tutorial")
-                .setMessage("Hello! Thank you for installing Rehabit!"+"\n"+
-                        "Swipe up from (or click on) the bottom of the screen for the Settings page")
-                .setPositiveButton(android.R.string.yes, null)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .show();*/
 
     }
 
@@ -246,6 +262,55 @@ public class GridActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 int position = sp.getSelectedItemPosition();
                 selectedAppName = apps.get(position).getName();
+                if(!oldselectedAppName.equals(selectedAppName)){
+                    //sets state so that app name is only sent to database if it is a new app
+                    selectedChange="Change";
+                    //adds feedback system to see trends in apps that people choose for single-app selection
+                    requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+                    request = new StringRequest(Request.Method.POST, "http://rehabit.000webhostapp.com/selectApp.php", new Response.Listener<String>() {
+
+                        @Override
+                        public void onResponse(String response) {
+                            new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                                    .setMessage("response! "+ response + "\n" + selectedChange + "\n"+selectedAppName.toString()+"\n"+oldselectedAppName.toString())
+                                    .setPositiveButton(android.R.string.yes, null)
+                                    .setIcon(android.R.drawable.ic_dialog_info)
+                                    .show();
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            new android.support.v7.app.AlertDialog.Builder(GridActivity.this)
+                                    .setMessage("error! " + error)
+                                    .setPositiveButton(android.R.string.yes, null)
+                                    .setIcon(android.R.drawable.ic_dialog_info)
+                                    .show();
+                        }
+                    }){
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError{
+
+                            Map<String, String> hashMap = new HashMap<String, String>();
+                            if(!selectedAppName.equals("None")&&selectedChange.equals("Change"))
+                                hashMap.put("appSelected",selectedAppName);
+                            return hashMap;
+                        }
+
+                        @Override
+                        public Map<String,String> getHeaders()throws AuthFailureError{
+                            Map<String,String> params = new HashMap<String, String>();
+                            params.put("Content-Type","application/x-www-form-urlencoded");
+                            return params;
+                        }
+                    };
+                    if(!selectedAppName.equals("None")&&selectedChange.equals("Change"))
+                        requestQueue.add(request);
+                }
+
+                else
+                    selectedChange = "No change";
+                oldselectedAppName=selectedAppName;
             }
 
             public void onNothingSelected(AdapterView<?> parent){
@@ -271,15 +336,10 @@ public class GridActivity extends AppCompatActivity {
 
             //adds apps to shuffled list and normal app list for initialization
             appsshuffle.add(app);
+            appsoriginal.add(app);
             apps.add(app);
             app.position = appsshuffle.indexOf(app);
             app.position = apps.indexOf(app);
-            for(int x=0;x<apps.size()-1;x++){
-                if(apps.get(x).getName().equals(app.name)){
-                    apps.remove(app);
-                    appsshuffle.remove(app);
-                }
-            }
         }
     }
 
@@ -288,13 +348,19 @@ public class GridActivity extends AppCompatActivity {
         if (gridView.isEditMode()) {
             gridView.stopEditMode();
             //sets back button to update apps for drag and drop
-            updateApps();
+            if(!switch1.isChecked())
+                updateApps();
         } else {
             super.onBackPressed();
         }
     }
 
     public void updateApps(){
+
+        /*sp = (Spinner)findViewById(R.id.spinner);
+        SpinnerAdapter adapter = new SpinnerAdapter(getApplicationContext(), R.layout.spinner_layout, R.id.spinnerText, (ArrayList)apps);
+        sp.setAdapter(adapter);*/
+
         int size = gridView.getChildCount();
         manager = getPackageManager();
 
@@ -311,11 +377,13 @@ public class GridActivity extends AppCompatActivity {
             for(int y=0;y<availableActivities.size();y++) {
                 if (hol.getAppName().equals(availableActivities.get(y).loadLabel(manager))){
                     appsshuffle.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
+                    appsshuffle.get(i).setIcon(availableActivities.get(y).loadIcon(manager));
                     appsoriginal.get(i).setLabel(availableActivities.get(y).activityInfo.packageName);
                     appsoriginal.get(i).setIcon(availableActivities.get(y).loadIcon(manager));
                 }
             }
         }
+
     }
 
 }

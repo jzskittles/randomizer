@@ -46,8 +46,8 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
             convertView.setTag(holder);
         }else
             holder = (ViewHolder)convertView.getTag();
-        holder.letterText.setText(items.get(position).getName());
-        holder.icon.setImageDrawable(items.get(position).getIcon());
+        //holder.letterText.setText(items.get(position).getName());
+        //holder.icon.setImageDrawable(items.get(position).getIcon());
 
         return convertView;
     }
@@ -63,9 +63,10 @@ public class GridViewAdapter extends BaseDynamicGridAdapter {
             Display display = wm.getDefaultDisplay();
             int width = display.getWidth();
             int height = display.getHeight();
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/5-20,width/5-20);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width/5-45,width/5-45);
 
             letterText = (TextView) view.findViewById(R.id.text);
+            letterText.setTextSize(10);
             icon = (ImageView)view.findViewById(R.id.icon);
             icon.setLayoutParams(layoutParams);
             icon.setScaleType(ImageView.ScaleType.CENTER_CROP);
