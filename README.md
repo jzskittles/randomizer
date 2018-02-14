@@ -1,4 +1,4 @@
-# randomizer
+# Rehabit
 Have you ever had that one app that you habitually use?
 Or even just an app that you have been spending too much time on?
 
