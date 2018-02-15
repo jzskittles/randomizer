@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -87,8 +88,19 @@ public class GridActivity extends AppCompatActivity {
         //launch initial dialog, welcome page
         tutorial();
 
-
+        Typeface face = Typeface.createFromAsset(getApplicationContext().getAssets(),"Roboto-Regular.ttf");
         switch1 = (Switch)findViewById(R.id.switchon);
+        switch1.setSwitchTypeface(face);
+
+        tutorial = (Button)findViewById(R.id.button);
+        tutorial.setTypeface(face);
+        tutorial.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent linkTutorial = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=mV5LUcEBH6g&feature=youtu.be"));
+                startActivity(linkTutorial);
+            }
+        });
 
         slidingPaneLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         //adds listeners and allows panel to sense swipe/click
@@ -130,8 +142,18 @@ public class GridActivity extends AppCompatActivity {
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
                 TextView tx =(TextView)findViewById(R.id.textView);
+                TextView tx2 = (TextView)findViewById(R.id.textView2);
+                TextView tx3 = (TextView)findViewById(R.id.textView3);
+                TextView tx5 = (TextView)findViewById(R.id.textView5);
+                TextView tx7 = (TextView)findViewById(R.id.textView7);
+
                 Typeface face = Typeface.createFromAsset(getApplicationContext().getAssets(),"Roboto-Regular.ttf");
                 tx.setTypeface(face);
+                tx2.setTypeface(face);
+                tx3.setTypeface(face);
+                tx5.setTypeface(face);
+                tx7.setTypeface(face);
+
                 RelativeLayout mainLayout=(RelativeLayout)findViewById(R.id.mainrelative);
 
                 if(previousState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)&&newState.equals(SlidingUpPanelLayout.PanelState.DRAGGING)){
